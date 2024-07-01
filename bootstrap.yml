@@ -1,0 +1,37 @@
+---
+- name: Bootstrap a newly flashed Raspberry Pi OS image
+  hosts: bootstrap
+  become: yes
+
+  handlers:
+    - name: reboot
+      reboot:
+
+  tasks:
+    - name: Change the password hashing algorithm
+      lineinfile:
+        path: /etc/login.defs
+        regex: '^ENCRYPT_METHOD\s[A-Z,0-9]*'
+        firstmatch: yes
+        line: 'ENCRYPT_METHOD YESCRYPT'
+
+    - name: Configure the hostname
+      block:
+        - name: Set the hostname
+          hostname:
+            name: demopi
+
+        - name: Remove the original entry from /etc/hosts for a cleaner result
+          lineinfile:
+            path: /etc/hosts
+            regex: '^127\.0\.1\.1\sraspberrypi'
+            state: absent
+
+        - name: Set the hostname local route in /etc/hosts
+          lineinfile:
+            path: /etc/hosts
+            insertafter: '^127\.0\.0\.1\slocalhost'
+            firstmatch: yes
+            regex: '^127\.0\.1\.1\s[a-z]*'
+            line: '127.0.1.1	demopi'
+      notify: reboot
