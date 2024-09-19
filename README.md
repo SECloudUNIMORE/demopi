@@ -17,3 +17,7 @@ A platform for showcasing activities based on Raspberry Pi hardware.
    ```
    Do expect this playbook to fail at the reboot stage, since it
    cannot check the new hostname automatically.
+7. run the main Ansible Playbook:
+   ```sh
+   ansible-playbook -i inventory --user <USER> main.yml
+   ```

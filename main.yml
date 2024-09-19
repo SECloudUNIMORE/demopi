@@ -1,0 +1,38 @@
+---
+- name: Setup Demo Pi
+  hosts: demopi
+  become: yes
+
+  handlers:
+    - name: reboot
+      reboot:
+
+  tasks:
+    - name: Change the password hashing algorithm
+      lineinfile:
+        path: /etc/login.defs
+        regex: '^ENCRYPT_METHOD\s[A-Z,0-9]*'
+        firstmatch: yes
+        line: 'ENCRYPT_METHOD YESCRYPT'
+
+    - name: Configure the hostname
+      block:
+        - name: Set the hostname
+          hostname:
+            name: demopi
+
+        - name: Set the hostname local route in /etc/hosts
+          lineinfile:
+            path: /etc/hosts
+            insertafter: '^127\.0\.0\.1\slocalhost'
+            firstmatch: yes
+            regex: '^127\.0\.1\.1\s[a-z]*'
+            line: '127.0.1.1	demopi'
+      notify: reboot
+
+    - name: Add an unprivileged user
+      user:
+        name: demo
+        comment: 'Automotive Cyberphysical and Embedded Security (ACES)'
+        create_home: yes
+        state: present
