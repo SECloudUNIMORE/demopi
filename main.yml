@@ -39,8 +39,18 @@
 
     # Follows the `do_boot_behaviour()` function from `raspi-config`
     # (see https://github.com/RPi-Distro/raspi-config/blob/bookworm/raspi-config)
-    - name: Ensure the display manager is installed
-      package:
-        name: lightdm
-        state: latest
+    - name: Configure the desktop environment for unprivileged autologin
+      block:
+        - name: Ensure the display manager is installed
+          package:
+            name: lightdm
+            state: latest
+
+        # Systemd targets are not supported, manipulate symlinks directly
+        # (see https://stackoverflow.com/questions/64701241/how-do-i-write-ansible-task-for-systemctl-set-default-graphical-target-without/64701430#64701430)
+        - name: Enable the graphical environment
+          file:
+            src: /usr/lib/systemd/system/graphical.target
+            dest: /etc/systemd/system/default.target
+            state: link
       notify: reboot
