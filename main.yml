@@ -36,3 +36,11 @@
         comment: 'Automotive Cyberphysical and Embedded Security (ACES)'
         create_home: yes
         state: present
+
+    # Follows the `do_boot_behaviour()` function from `raspi-config`
+    # (see https://github.com/RPi-Distro/raspi-config/blob/bookworm/raspi-config)
+    - name: Ensure the display manager is installed
+      package:
+        name: lightdm
+        state: latest
+      notify: reboot
