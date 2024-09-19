@@ -53,4 +53,10 @@
             src: /lib/systemd/system/graphical.target
             dest: /etc/systemd/system/default.target
             state: link
+
+        - name: Set the autologin user
+          lineinfile:
+            path: /etc/lightdm/lightdm.conf
+            regex: '^#?autologin-user='
+            line: 'autologin-user=demo'
       notify: reboot
