@@ -59,4 +59,9 @@
             path: /etc/lightdm/lightdm.conf
             regex: '^#?autologin-user='
             line: 'autologin-user=demo'
+
+        - name: Configure the autologin service
+          copy:
+            src: files/raspios/etc/systemd/system/getty@tty1.service.d/autologin.conf
+            dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
       notify: reboot
