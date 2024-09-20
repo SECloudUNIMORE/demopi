@@ -17,9 +17,3 @@ A platform for showcasing activities based on Raspberry Pi hardware.
    ```
    Do expect this playbook to fail at the reboot stage, since it
    cannot check the new hostname automatically.
-7. login through SSH and change the password to a stronger one:
-   ```sh
-   ssh <USER>@demopi.local
-   $ passwd
-   $ exit
-   ```
