@@ -7,6 +7,16 @@
     - name: reboot
       reboot:
 
+  pre_tasks:
+    - name: Keep the system up-to-date
+      apt:
+        update_cache: yes
+        upgrade: dist
+        autoremove: yes
+        purge: yes
+        autoclean: yes
+        clean: yes
+
   tasks:
     - name: Change the password hashing algorithm
       lineinfile:
