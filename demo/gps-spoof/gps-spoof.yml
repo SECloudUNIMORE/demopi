@@ -17,6 +17,15 @@
         path: /opt/demo/gps-spoof/gps.sig
         state: absent
 
+    - name: restart
+      service:
+        name: gps-spoof
+        state: restarted
+
+    - name: reload-systemd
+      systemd_service:
+        daemon_reload: yes
+
   tasks:
     - name: Have the build tools at hand
       package:
@@ -70,10 +79,49 @@
         chdir: /opt/demo/gps-spoof
         cmd: gps-sdr-sim/gps-sdr-sim -e brdc -s 2500000 -x waypoints.csv -o gps.sig
         creates: gps.sig
+      notify: restart
 
+    # NOTE: permissions get applied *before* the above handler runs
     - name: Set permissions to the GPS signal
       file:
         path: /opt/demo/gps-spoof/gps.sig
         owner: root
         group: demo
         mode: 0644
+
+    - name: Copy the Python script outside the repo
+      copy:
+        src: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
+        remote_src: yes
+        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
+        owner: root
+        group: demo
+        mode: 0755
+
+    - name: Patch gps-sdr-sim-uhd.py
+      ansible.posix.patch:
+        src: files/gps-sdr-sim-uhd.py.patch
+        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
+
+    - name: Install the GNU Radio framework
+      package:
+        name: gnuradio
+        state: latest
+
+    - name: Install the service unit file
+      copy:
+        src: gps-spoof.service
+        dest: /opt/demo/gps-spoof/gps-spoof.service
+      notify: reload-systemd
+
+    - name: Add the service unit to systemd
+      file:
+        src: /opt/demo/gps-spoof/gps-spoof.service
+        dest: /etc/systemd/system/gps-spoof.service
+        state: link
+      notify: reload-systemd
+
+    - name: Enable the systemd service
+      service:
+        name: gps-spoof
+        enabled: yes
