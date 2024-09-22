@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ATTR{idVendor}=="2500", ATTR{idProduct}=="0020", SYMLINK+="uhd%k", SYMLINK+="usrp", OWNER="demo", GROUP="demo", TAG+="uaccess", TAG+="systemd", ENV{SYSTEMD_WANTS}="gps-spoof.service"

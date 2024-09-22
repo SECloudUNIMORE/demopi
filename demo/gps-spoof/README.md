@@ -9,6 +9,7 @@ Demonstrate a GPS spoofing attack.
    ```sh
    ansible-playbook -i ../../inventory --user <USER> gps-spoof.yml
    ```
+4. plug in an Ettus USRP B200 and wait for signal transmission to begin
 
 ## References
 Check out the GPS signal simulator on [GitHub](https://github.com/osqzss/gps-sdr-sim) for details on the required files.

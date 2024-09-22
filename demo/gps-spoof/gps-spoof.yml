@@ -36,6 +36,9 @@
       systemd_service:
         daemon_reload: yes
 
+    - name: reboot
+      reboot:
+
   tasks:
     - name: Have the build tools at hand
       package:
@@ -128,3 +131,34 @@
       service:
         name: gps-spoof
         enabled: yes
+
+    - name: Install the UHD tools
+      package:
+        name: uhd-host
+        state: latest
+
+    - name: Create the directory for USRP firmware images
+      file:
+        path: /opt/demo/uhd/images
+        owner: root
+        group: demo
+        mode: 0755
+        state: directory
+
+    - name: Download the firmware for USRP hardware
+      command:
+        cmd: uhd_images_downloader -t 'b2(00_|xx_common)' --install-location=/opt/demo/uhd/images
+
+    - name: Set permissions for the firmware images
+      file:
+        path: /opt/demo/uhd/images
+        owner: root
+        group: demo
+        mode: u=rwX,g=rX,o=rX
+        recurse: yes
+
+    - name: Install custom UDEV rules for USRP hardware
+      copy:
+        src: usrp.rules
+        dest: /etc/udev/rules.d/33-usrp.rules
+      notify: reboot
