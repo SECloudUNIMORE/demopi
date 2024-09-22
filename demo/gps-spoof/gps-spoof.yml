@@ -9,6 +9,13 @@
       file:
         path: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim
         state: absent
+      notify: regenerate
+
+    # Remove the GPS signal, so a fresh one gets generated
+    - name: regenerate
+      file:
+        path: /opt/demo/gps-spoof/gps.sig
+        state: absent
 
   tasks:
     - name: Have the build tools at hand
@@ -42,3 +49,31 @@
         chdir: /opt/demo/gps-spoof/gps-sdr-sim
         cmd: gcc gpssim.c -lm -O3 -o gps-sdr-sim
         creates: gps-sdr-sim
+
+    - name: Provide the ephemeris
+      copy:
+        src: brdc
+        dest: /opt/demo/gps-spoof/brdc
+      notify: regenerate
+
+    - name: Provide the waypoints (ECEF)
+      copy:
+        src: waypoints.ecef.csv
+        dest: /opt/demo/gps-spoof/waypoints.csv
+      notify: regenerate
+
+    - name: Run the regenerate handler, if necessary
+      meta: flush_handlers
+
+    - name: Generate the GPS signal
+      command:
+        chdir: /opt/demo/gps-spoof
+        cmd: gps-sdr-sim/gps-sdr-sim -e brdc -s 2500000 -u waypoints.csv -o gps.sig
+        creates: gps.sig
+
+    - name: Set permissions to the GPS signal
+      file:
+        path: /opt/demo/gps-spoof/gps.sig
+        owner: root
+        group: demo
+        mode: 0644
