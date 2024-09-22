@@ -4,7 +4,7 @@ BindsTo=dev-usrp.device
 After=dev-usrp.device
 
 [Service]
-Type=simple
+Type=exec
 User=demo
 Group=demo
 Environment=UHD_IMAGES_DIR=/opt/demo/uhd/images
