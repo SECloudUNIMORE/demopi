@@ -56,9 +56,9 @@
         dest: /opt/demo/gps-spoof/brdc
       notify: regenerate
 
-    - name: Provide the waypoints (ECEF)
+    - name: Provide the waypoints (LLA)
       copy:
-        src: waypoints.ecef.csv
+        src: waypoints.lla.csv
         dest: /opt/demo/gps-spoof/waypoints.csv
       notify: regenerate
 
@@ -68,7 +68,7 @@
     - name: Generate the GPS signal
       command:
         chdir: /opt/demo/gps-spoof
-        cmd: gps-sdr-sim/gps-sdr-sim -e brdc -s 2500000 -u waypoints.csv -o gps.sig
+        cmd: gps-sdr-sim/gps-sdr-sim -e brdc -s 2500000 -x waypoints.csv -o gps.sig
         creates: gps.sig
 
     - name: Set permissions to the GPS signal
