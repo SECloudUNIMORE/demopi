@@ -50,7 +50,7 @@
         # (see https://stackoverflow.com/questions/64701241/how-do-i-write-ansible-task-for-systemctl-set-default-graphical-target-without/64701430#64701430)
         - name: Enable the graphical environment
           file:
-            src: /usr/lib/systemd/system/graphical.target
+            src: /lib/systemd/system/graphical.target
             dest: /etc/systemd/system/default.target
             state: link
       notify: reboot
