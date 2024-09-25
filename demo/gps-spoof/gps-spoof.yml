@@ -4,6 +4,16 @@
   become: yes
 
   handlers:
+    # Make a copy of the script, so the repository doesn't get tainted by patches
+    - name: tx-script
+      copy:
+        src: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
+        remote_src: yes
+        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
+        owner: root
+        group: demo
+        mode: 0755
+
     # Remove the executable, so it gets rebuilt
     - name: rebuild
       file:
@@ -48,6 +58,7 @@
         dest: /opt/demo/gps-spoof/gps-sdr-sim
         depth: 1
         force: yes
+      notify: tx-script
       notify: rebuild
 
     - name: Run the rebuild handler, if necessary
@@ -89,15 +100,7 @@
         group: demo
         mode: 0644
 
-    - name: Copy the Python script outside the repo
-      copy:
-        src: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
-        remote_src: yes
-        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
-        owner: root
-        group: demo
-        mode: 0755
-
+    # NOTE: patching a copy, to avoid tainting the repository and thus maintain idempotence
     - name: Patch gps-sdr-sim-uhd.py
       ansible.posix.patch:
         src: files/gps-sdr-sim-uhd.py.patch
