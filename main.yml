@@ -76,6 +76,14 @@
             dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
       notify: reboot
 
+    - name: Rotate the screen
+      blockinfile:
+        path: /home/demo/.config/wayfire.ini
+        block: |
+          [output:DSI-1]
+          transform = 180
+      notify: reboot
+
     - name: Create the demo install directory
       file:
         path: /opt/demo
