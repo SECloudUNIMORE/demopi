@@ -2,7 +2,6 @@
 Description=GPS Spoofing attack demo
 BindsTo=dev-usrp.device
 After=dev-usrp.device
-ConditionUser=!root
 
 [Service]
 Type=simple
