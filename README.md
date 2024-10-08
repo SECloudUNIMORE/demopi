@@ -21,3 +21,6 @@ A platform for showcasing activities based on Raspberry Pi hardware.
    ```sh
    ansible-playbook -i inventory --user <USER> main.yml
    ```
+
+## License
+This work is licensed under the terms and conditions of the MIT permissive license.
