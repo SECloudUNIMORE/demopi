@@ -1,0 +1,164 @@
+---
+- name: Setup the GPS Spoofing demo
+  hosts: demopi
+  become: yes
+
+  handlers:
+    # Make a copy of the script, so the repository doesn't get tainted by patches
+    - name: tx-script
+      copy:
+        src: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
+        remote_src: yes
+        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
+        owner: root
+        group: demo
+        mode: 0755
+
+    # Remove the executable, so it gets rebuilt
+    - name: rebuild
+      file:
+        path: /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim
+        state: absent
+      notify: regenerate
+
+    # Remove the GPS signal, so a fresh one gets generated
+    - name: regenerate
+      file:
+        path: /opt/demo/gps-spoof/gps.sig
+        state: absent
+
+    - name: restart
+      service:
+        name: gps-spoof
+        state: restarted
+
+    - name: reload-systemd
+      systemd_service:
+        daemon_reload: yes
+
+    - name: reboot
+      reboot:
+
+  tasks:
+    - name: Have the build tools at hand
+      package:
+        name:
+          - build-essential
+          - git
+        state: latest
+
+    - name: Create the install directory
+      file:
+        path: /opt/demo/gps-spoof
+        owner: root
+        group: demo
+        mode: 0755
+        state: directory
+
+    - name: Fetch the GPS simulation software
+      git:
+        repo: https://github.com/osqzss/gps-sdr-sim.git
+        dest: /opt/demo/gps-spoof/gps-sdr-sim
+        depth: 1
+        force: yes
+      notify: tx-script
+      notify: rebuild
+
+    - name: Run the rebuild handler, if necessary
+      meta: flush_handlers
+
+    - name: Build the GPS simulation software
+      command:
+        chdir: /opt/demo/gps-spoof/gps-sdr-sim
+        cmd: gcc gpssim.c -lm -O3 -o gps-sdr-sim
+        creates: gps-sdr-sim
+
+    - name: Provide the ephemeris
+      copy:
+        src: brdc
+        dest: /opt/demo/gps-spoof/brdc
+      notify: regenerate
+
+    - name: Provide the waypoints (LLA)
+      copy:
+        src: waypoints.lla.csv
+        dest: /opt/demo/gps-spoof/waypoints.csv
+      notify: regenerate
+
+    - name: Run the regenerate handler, if necessary
+      meta: flush_handlers
+
+    - name: Generate the GPS signal
+      command:
+        chdir: /opt/demo/gps-spoof
+        cmd: gps-sdr-sim/gps-sdr-sim -e brdc -s 2500000 -x waypoints.csv -o gps.sig
+        creates: gps.sig
+      notify: restart
+
+    # NOTE: permissions get applied *before* the above handler runs
+    - name: Set permissions to the GPS signal
+      file:
+        path: /opt/demo/gps-spoof/gps.sig
+        owner: root
+        group: demo
+        mode: 0644
+
+    # NOTE: patching a copy, to avoid tainting the repository and thus maintain idempotence
+    - name: Patch gps-sdr-sim-uhd.py
+      ansible.posix.patch:
+        src: files/gps-sdr-sim-uhd.py.patch
+        dest: /opt/demo/gps-spoof/gps-sdr-sim-uhd.py
+
+    - name: Install the GNU Radio framework
+      package:
+        name: gnuradio
+        state: latest
+
+    - name: Install the service unit file
+      copy:
+        src: gps-spoof.service
+        dest: /opt/demo/gps-spoof/gps-spoof.service
+      notify: reload-systemd
+
+    - name: Add the service unit to systemd
+      file:
+        src: /opt/demo/gps-spoof/gps-spoof.service
+        dest: /etc/systemd/system/gps-spoof.service
+        state: link
+      notify: reload-systemd
+
+    - name: Enable the systemd service
+      service:
+        name: gps-spoof
+        enabled: yes
+
+    - name: Install the UHD tools
+      package:
+        name: uhd-host
+        state: latest
+
+    - name: Create the directory for USRP firmware images
+      file:
+        path: /opt/demo/uhd/images
+        owner: root
+        group: demo
+        mode: 0755
+        state: directory
+
+    - name: Download the firmware for USRP hardware
+      command:
+        cmd: uhd_images_downloader -t 'b2(00_|xx_common)' --install-location=/opt/demo/uhd/images
+
+    - name: Set permissions for the firmware images
+      file:
+        path: /opt/demo/uhd/images
+        owner: root
+        group: demo
+        mode: u=rwX,g=rX,o=rX
+        recurse: yes
+
+    - name: Install custom UDEV rules for USRP hardware
+      copy:
+        src: usrp.rules
+        dest: /etc/udev/rules.d/33-usrp.rules
+      notify: reboot

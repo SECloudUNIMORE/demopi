@@ -1,0 +1,7 @@
+--- /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
++++ /opt/demo/gps-spoof/gps-sdr-sim/gps-sdr-sim-uhd.py
+@@ -92,2 +92,2 @@
+-    input('Press Enter to quit: ')
+-    tb.stop()
++    #input('Press Enter to quit: ')
++    #tb.stop()

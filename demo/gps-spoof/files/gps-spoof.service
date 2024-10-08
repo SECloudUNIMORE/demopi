@@ -1,0 +1,16 @@
+[Unit]
+Description=GPS Spoofing attack demo
+BindsTo=dev-usrp.device
+After=dev-usrp.device
+
+[Service]
+Type=exec
+User=demo
+Group=demo
+Environment=UHD_IMAGES_DIR=/opt/demo/uhd/images
+WorkingDirectory=/opt/demo/gps-spoof/
+ExecStart=/opt/demo/gps-spoof/gps-sdr-sim-uhd.py -s 2500000 -x 40 -t gps.sig
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
