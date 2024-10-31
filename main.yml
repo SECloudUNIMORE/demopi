@@ -54,7 +54,7 @@
         - name: Ensure the display manager is installed
           package:
             name: lightdm
-            state: latest
+            state: present
 
         # Systemd targets are not supported, manipulate symlinks directly
         # (see https://stackoverflow.com/questions/64701241/how-do-i-write-ansible-task-for-systemctl-set-default-graphical-target-without/64701430#64701430)
