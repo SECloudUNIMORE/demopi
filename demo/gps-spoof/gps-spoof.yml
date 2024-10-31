@@ -45,7 +45,7 @@
         name:
           - build-essential
           - git
-        state: latest
+        state: present
 
     - name: Create the install directory
       file:
@@ -112,7 +112,7 @@
     - name: Install the GNU Radio framework
       package:
         name: gnuradio
-        state: latest
+        state: present
 
     - name: Install the service unit file
       copy:
@@ -135,7 +135,7 @@
     - name: Install the UHD tools
       package:
         name: uhd-host
-        state: latest
+        state: present
 
     - name: Create the directory for USRP firmware images
       file:
