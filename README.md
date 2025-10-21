@@ -2,7 +2,7 @@
 A platform for showcasing activities based on Raspberry Pi hardware.
 
 ## Installation
-1. write the Raspberry Pi OS image to a micro SD card
+1. write the Raspberry Pi OS image to a microSD card
 2. run the `bootstrap.sh` script inside the `bootfs` partition
 3. insert the card into the Raspberry Pi board and power it up
 4. connect the Raspberry Pi board and the controlling machine to the same network
@@ -15,7 +15,7 @@ A platform for showcasing activities based on Raspberry Pi hardware.
    ```sh
    ansible-playbook -i inventory --user <USER> bootstrap.yml
    ```
-   Do expect this playbook to fail at the reboot stage, since it
+   Do expect this playbook to hang at the reboot stage, since it
    cannot check the new hostname automatically.
 7. run the main Ansible Playbook:
    ```sh
