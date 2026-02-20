@@ -1,7 +1,9 @@
-# Demo Pi
+Demo Pi
+=======
 A platform for showcasing activities based on Raspberry Pi hardware.
 
-## Installation
+Installation
+------------
 1. write the Raspberry Pi OS image to a microSD card
 2. run the `bootstrap.sh` script inside the `bootfs` partition
 3. insert the card into the Raspberry Pi board and power it up
@@ -22,5 +24,6 @@ A platform for showcasing activities based on Raspberry Pi hardware.
    ansible-playbook -i inventory --user <USER> main.yml
    ```
 
-## License
+License
+-------
 This work is licensed under the terms and conditions of the MIT permissive license.
