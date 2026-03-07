@@ -11,15 +11,9 @@ Installation
    (ensure your mDNS resolver is working properly)
 5. authorize your SSH key:
    ```sh
-   ssh-copy-id -i ~/.ssh/<ID_PRIV_KEY> <USER>@raspberrypi.local
+   ssh-copy-id -i ~/.ssh/<ID_PRIV_KEY> <USER>@demopi.local
    ```
-6. use the dedicated Ansible Playbook to initialize the device:
-   ```sh
-   ansible-playbook -i inventory --user <USER> bootstrap.yml
-   ```
-   Do expect this playbook to hang at the reboot stage, since it
-   cannot check the new hostname automatically.
-7. run the main Ansible Playbook:
+6. run the Ansible Playbook:
    ```sh
    ansible-playbook -i inventory --user <USER> main.yml
    ```
