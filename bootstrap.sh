@@ -16,7 +16,7 @@ echo "$username:$(mkpasswd --method=yescrypt)" > userconf.txt
 # 2. Enable remote access through SSH
 # (see "rootfs/usr/lib/systemd/system/sshswitch.service")
 # (see "rootfs/usr/lib/raspberrypi-sys-mods/sshswitch")
-touch ssh
+touch ssh.txt
 
 # 3. Set the hostname
 # (see https://stackoverflow.com/questions/2642585/read-a-variable-in-bash-with-a-default-value/2642592#2642592)
