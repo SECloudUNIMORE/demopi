@@ -35,11 +35,11 @@ if [ -f /usr/lib/raspberrypi-sys-mods/imager_custom ]; then
 	/usr/lib/raspberrypi-sys-mods/imager_custom set_hostname $hostname
 fi
 
-rm -f /boot/firstboot.sh
+rm -f /boot/firmware/firstboot.sh
 
-sed -i 's|systemd.run=/boot/firstboot.sh systemd.run_success_action=reboot systemd.run_failure_action=none ||g' /boot/cmdline.txt
+sed -i 's|systemd.run=/boot/firmware/firstboot.sh systemd.run_success_action=reboot systemd.run_failure_action=none ||g' /boot/firmware/cmdline.txt
 EOF
 chmod a+x firstboot.sh
 # NOTE: this script should be running inside the root directory of the
 #       "bootfs" partition, thus "cmdline.txt" is expected to be there.
-sed -i 's|^|systemd.run=/boot/firstboot.sh systemd.run_success_action=reboot systemd.run_failure_action=none |' cmdline.txt
+sed -i 's|^|systemd.run=/boot/firmware/firstboot.sh systemd.run_success_action=reboot systemd.run_failure_action=none |' cmdline.txt
